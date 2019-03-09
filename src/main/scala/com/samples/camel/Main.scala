@@ -7,8 +7,9 @@ object Main extends App {
   val context = new DefaultCamelContext()
   context.addRoutes(new RouteBuilder() {
     override def configure(): Unit = {
-      from("file:data/inbox?noop=true")
-        .to("file:data/outbox")
+      // 🅐 Java DSL route
+      from("file:data/inbox?noop=true") // 🅑 consumer
+        .to("file:data/outbox")         // 🅒 producer
     }
   })
   context.start()
