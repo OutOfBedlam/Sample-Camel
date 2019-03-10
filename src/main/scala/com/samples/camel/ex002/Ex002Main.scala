@@ -1,10 +1,10 @@
-package com.samples.camel
+package com.samples.camel.ex002
 
 import org.apache.camel.Exchange
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.DefaultCamelContext
 
-object Main extends App {
+object Ex002Main extends App {
   val context = new DefaultCamelContext()
   context.addRoutes(new RouteBuilder() {
     override def configure(): Unit = {
