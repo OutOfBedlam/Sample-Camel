@@ -14,6 +14,7 @@ object Ex002Main extends App {
           val filename = exchange.getIn.getHeader("CamelFileName")  // 🅑
           println(s"=====> processing file: $filename}")
         }
+        .log("-----> processing file: ${in.header.CamelFileName}")  // 🅒
         .to("file:data/outbox")
     }
   })
