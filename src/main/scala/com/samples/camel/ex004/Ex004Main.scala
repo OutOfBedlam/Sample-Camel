@@ -1,7 +1,5 @@
 package com.samples.camel.ex004
 
-import java.io.File
-
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.{DefaultCamelContext, SimpleRegistry}
 import org.h2.jdbcx.JdbcDataSource
@@ -10,12 +8,9 @@ object Ex004Main extends App {
 
   val basedir = "/tmp/camel_example/data"
 
-  // delete existing db file so that new one can be created
-  Seq("h2db.mv.db", "h2db.trace.db").foreach( n => new File(basedir, n).delete() )
-
   // 🅐 h2 database setup
   val ds = new JdbcDataSource
-  ds.setURL(s"jdbc:h2:$basedir/h2db")
+  ds.setURL(s"jdbc:h2:$basedir/h2db;mode=MySQL")
   ds.setUser("sa")
   ds.setPassword("sa")
 
@@ -24,7 +19,7 @@ object Ex004Main extends App {
   val stmt1 = conn.createStatement()
   stmt1.executeUpdate(
     """
-      |create table test_msg(
+      |create table if not exists test_msg(
       |   ID INT PRIMARY KEY,
       |   SUBJECT VARCHAR(80),
       |   BODY VARCHAR(1000),
@@ -42,7 +37,7 @@ object Ex004Main extends App {
       "john@email.com", "R"),
   )
   data.foreach{ r =>
-    val stmt = conn.prepareStatement("insert into test_msg values(?, ?, ?, ?, ?)")
+    val stmt = conn.prepareStatement("INSERT INTO test_msg VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE status = 'R'")
     stmt.setInt(1, r._1)
     stmt.setString(2, r._2)
     stmt.setString(3, r._3)
