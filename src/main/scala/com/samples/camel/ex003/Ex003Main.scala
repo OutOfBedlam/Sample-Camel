@@ -6,11 +6,9 @@ import org.h2.jdbcx.JdbcDataSource
 
 object Ex003Main extends App {
 
-  val basedir = "/tmp/camel_example/data"
-
   // 🅐 h2 database setup
   val ds = new JdbcDataSource
-  ds.setURL(s"jdbc:h2:$basedir/h2db;mode=MySQL")
+  ds.setURL(s"jdbc:h2:mem:h2db;mode=MySQL;DB_CLOSE_DELAY=-1")
   ds.setUser("sa")
   ds.setPassword("sa")
 
