@@ -42,27 +42,30 @@ class RestConsumerTest extends CamelTestSupport {
     override def configure(): Unit = {
       restConfiguration().component("spark-rest").port(8080)
         .bindingMode(RestBindingMode.json)
+        .contextPath("/")
+        .apiContextPath("/api-doc")
         .dataFormatProperty("prettyPrint", "true")
 
-      rest("/user").get("/view/{id}").outType(classOf[User])
-        .route().to("bean:userService?method=user(${header.id})", "mock:ignore")
-        .endRest()
+      val user = rest("/user/view").description("User API")
+        .consumes("application/json").produces("application/json")
 
-      rest("/user").post("/view").`type`(classOf[User]).outType(classOf[String])
+      user.get("/{id}").outType(classOf[User])
+        .route().to("bean:userService?method=user(${header.id})", "mock:ignore")
+
+      user.post().`type`(classOf[User]).outType(classOf[String])
         .route().to("bean:userService?method=update", "mock:ignore")
-        .endRest()
     }
   }
 
   @Test
-  def testSimpleApi(): Unit = {
+  def testGetApi(): Unit = {
     val rsp = template.requestBodyAndHeader("http4://localhost:8080/user/view/2345", "",
       Exchange.HTTP_METHOD, "GET", classOf[String])
 
     assert(rsp == "{\n  \"name\" : \"Hong Gil Dong - 2345\"\n}")
 
     resultEndpoint.expectedMessageCount(1)
-    resultEndpoint.assertIsSatisfied(1000)
+    resultEndpoint.assertIsSatisfied(100000)
   }
 
   @Test
